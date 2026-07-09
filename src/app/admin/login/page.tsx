@@ -43,14 +43,14 @@ export default function AdminLogin() {
           {error && <div className="text-red-500 text-sm text-center font-bold bg-red-50 p-2 border border-red-200">{error}</div>}
           <div className="space-y-4">
             <div>
-              <label htmlFor="email-address" className="sr-only">Email address</label>
+              <label htmlFor="email-address" className="sr-only">User ID</label>
               <input
                 id="email-address"
                 name="email"
-                type="email"
+                type="text"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-vanguard-red focus:border-vanguard-red focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                placeholder="User ID"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -80,7 +80,7 @@ export default function AdminLogin() {
           </div>
         </form>
         <div className="mt-4 text-xs text-center text-gray-400">
-          Hint: Use admin@vanguard.com / password
+          Hint: Use nahida / nahida0211
         </div>
       </div>
     </div>

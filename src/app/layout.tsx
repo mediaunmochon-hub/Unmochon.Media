@@ -20,6 +20,8 @@ export const metadata: Metadata = {
   description: 'Rigorous journalistic aesthetic. Independent news, analysis, and opinion.',
 };
 
+import { Analytics } from '@vercel/analytics/react';
+
 export default function RootLayout({
   children,
 }: {
@@ -33,6 +35,7 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );

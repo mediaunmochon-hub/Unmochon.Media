@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.20",
+    "@types/bcryptjs": "^2.4.6",
+    "@vercel/analytics": "^2.0.1",
+    "bcryptjs": "^3.0.3",
     "cloudinary": "^2.10.0",
     "date-fns": "^4.4.0",
     "lucide-react": "^1.24.0",

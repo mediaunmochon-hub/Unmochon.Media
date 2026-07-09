@@ -13,6 +13,7 @@ type Article = {
   category: string;
   publishedAt: string;
   author: { name: string };
+  views?: number;
 };
 
 export default function AdminDashboard() {
@@ -63,7 +64,7 @@ export default function AdminDashboard() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 border border-gray-200 shadow-sm flex flex-col items-center justify-center">
           <span className="text-4xl font-serif font-bold text-black">{articles.length}</span>
           <span className="text-sm font-bold text-gray-500 uppercase tracking-widest mt-2">Total Articles</span>
@@ -76,6 +77,12 @@ export default function AdminDashboard() {
           <span className="text-4xl font-serif font-bold text-yellow-600">{draftsCount}</span>
           <span className="text-sm font-bold text-gray-500 uppercase tracking-widest mt-2">Drafts</span>
         </div>
+        <div className="bg-white p-6 border border-gray-200 shadow-sm flex flex-col items-center justify-center">
+          <span className="text-4xl font-serif font-bold text-blue-600">
+            {articles.reduce((sum, article) => sum + (article.views || 0), 0)}
+          </span>
+          <span className="text-sm font-bold text-gray-500 uppercase tracking-widest mt-2">Total Views</span>
+        </div>
       </div>
 
       <div className="bg-white border border-gray-200 shadow-sm overflow-hidden">
@@ -85,6 +92,7 @@ export default function AdminDashboard() {
               <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Title</th>
               <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Author</th>
               <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Date</th>
+              <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Views</th>
               <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
               <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
@@ -106,6 +114,9 @@ export default function AdminDashboard() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {article.publishedAt ? format(new Date(article.publishedAt), 'MMM d, yyyy') : '-'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">
+                    {article.views || 0}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold uppercase tracking-wider ${

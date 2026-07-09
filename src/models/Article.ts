@@ -7,6 +7,7 @@ export interface IArticle extends Document {
   content: string;
   featureImage: string;
   author: mongoose.Types.ObjectId;
+  authorName?: string;
   category: string;
   tags: string[];
   status: string;
@@ -24,6 +25,7 @@ const ArticleSchema: Schema<IArticle> = new Schema(
     content: { type: String, default: '' },
     featureImage: { type: String, default: '' },
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    authorName: { type: String },
     category: {
       type: String,
       enum: ['Politics', 'Economy', 'Tech', 'Culture', 'Opinion'],

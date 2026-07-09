@@ -2,14 +2,14 @@ import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import connectDB from '@/lib/db';
 import User from '@/models/User';
-// In a real app, use bcrypt. Here we'll do a simple mock for now, but let's assume raw string matching for simplicity or we can just mock a default admin.
+import bcrypt from 'bcryptjs';
 
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'email' },
+        email: { label: 'User ID', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
@@ -18,26 +18,31 @@ export const authOptions: NextAuthOptions = {
         await connectDB();
         
         // For demonstration, if DB is empty, let's create a default admin
-        const adminExists = await User.findOne({ email: 'admin@vanguard.com' });
+        const adminExists = await User.findOne({ email: 'nahida' });
         if (!adminExists) {
+          const hashedPassword = await bcrypt.hash('nahida0211', 10);
           await User.create({
-            name: 'Vanguard Admin',
-            email: 'admin@vanguard.com',
-            passwordHash: 'password', // INSECURE: Use bcrypt in production
+            name: 'Nahida',
+            email: 'nahida',
+            passwordHash: hashedPassword,
             role: 'admin'
           });
         }
 
         const user = await User.findOne({ email: credentials.email });
         
-        // Simple password check (replace with bcrypt.compare in production)
-        if (user && user.passwordHash === credentials.password) {
-          return {
-            id: user._id.toString(),
-            name: user.name,
-            email: user.email,
-            role: user.role,
-          };
+        if (user) {
+          // Backward compatibility check for plain-text password from old setup
+          const isMatch = await bcrypt.compare(credentials.password, user.passwordHash).catch(() => false);
+          
+          if (isMatch || user.passwordHash === credentials.password) {
+            return {
+              id: user._id.toString(),
+              name: user.name,
+              email: user.email,
+              role: user.role,
+            };
+          }
         }
         
         return null;

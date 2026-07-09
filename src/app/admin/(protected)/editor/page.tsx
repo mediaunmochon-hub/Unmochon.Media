@@ -16,7 +16,8 @@ function EditorForm() {
     featureImage: '',
     category: 'Politics',
     tags: '',
-    status: 'draft'
+    status: 'draft',
+    authorName: ''
   });
   
   const [loading, setLoading] = useState(false);
@@ -65,7 +66,8 @@ function EditorForm() {
       if (res.ok) {
         setFormData({
           ...data,
-          tags: data.tags ? data.tags.join(', ') : ''
+          tags: data.tags ? data.tags.join(', ') : '',
+          authorName: data.authorName || ''
         });
       } else {
         setError(data.error || 'Failed to fetch article');
@@ -180,6 +182,17 @@ function EditorForm() {
               className="w-full border border-gray-300 px-4 py-2 focus:outline-none focus:border-vanguard-red font-mono text-sm"
               placeholder="article-url-slug"
               required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 uppercase tracking-wider mb-2">Author Name (Optional)</label>
+            <input
+              type="text"
+              name="authorName"
+              value={formData.authorName}
+              onChange={handleChange}
+              className="w-full border border-gray-300 px-4 py-2 focus:outline-none focus:border-vanguard-red font-sans text-sm"
+              placeholder="Guest Author"
             />
           </div>
           <div>

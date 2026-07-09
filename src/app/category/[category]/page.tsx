@@ -100,7 +100,7 @@ export default async function CategoryPage({ params }: Props) {
                 </p>
               </Link>
               <div className="mt-auto text-xs text-gray-500 uppercase tracking-widest pt-4 border-t border-gray-100 flex justify-between">
-                <span className="font-bold">{article.author?.name || 'Vanguard Staff'}</span>
+                <span className="font-bold">{article.authorName || article.author?.name || 'Vanguard Staff'}</span>
                 <span>{article.publishedAt ? format(new Date(article.publishedAt), 'MMM d, yyyy') : ''}</span>
               </div>
             </article>

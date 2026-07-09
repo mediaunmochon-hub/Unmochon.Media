@@ -6,6 +6,8 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import { Metadata, ResolvingMetadata } from 'next';
+import SocialShare from '@/components/SocialShare';
+import ViewTracker from '@/components/ViewTracker';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -60,18 +62,7 @@ export default async function ArticlePage({ params }: Props) {
     <article className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20 relative">
       
       {/* Social Sharing - Desktop left gutter */}
-      <div className="hidden lg:flex flex-col gap-4 absolute left-8 top-32 text-gray-400">
-        <button className="p-2 border border-gray-200 hover:border-gray-400 hover:text-black transition-colors rounded-full" aria-label="Share on X">
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 24.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
-          </svg>
-        </button>
-        <button className="p-2 border border-gray-200 hover:border-gray-400 hover:text-black transition-colors rounded-full" aria-label="Share on Facebook">
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd"></path>
-          </svg>
-        </button>
-      </div>
+      <SocialShare title={article.title} className="hidden lg:flex flex-col gap-4 absolute left-8 top-32 text-gray-400" />
 
       <div className="max-w-[720px] mx-auto">
         {/* Header */}
@@ -89,11 +80,11 @@ export default async function ArticlePage({ params }: Props) {
           <div className="flex items-center justify-between border-t border-b border-vanguard-border py-4">
             <div className="flex items-center">
               <div className="w-12 h-12 bg-gray-200 rounded-full mr-4 flex items-center justify-center font-bold text-gray-500 uppercase">
-                {((article.author as any)?.name || 'V').charAt(0)}
+                {(article.authorName || (article.author as any)?.name || 'V').charAt(0)}
               </div>
               <div>
                 <div className="font-bold text-gray-900 uppercase tracking-wide text-sm">
-                  {(article.author as any)?.name || 'Vanguard Staff'}
+                  {article.authorName || (article.author as any)?.name || 'Vanguard Staff'}
                 </div>
                 <div className="text-xs text-gray-500 uppercase tracking-widest mt-1">
                   {article.publishedAt ? format(new Date(article.publishedAt), 'MMMM d, yyyy') : 'Date unknown'}
@@ -102,9 +93,7 @@ export default async function ArticlePage({ params }: Props) {
             </div>
             
             {/* Mobile Share (hidden on desktop) */}
-            <div className="flex lg:hidden gap-3 text-gray-400">
-               <button aria-label="Share on X"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 24.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg></button>
-            </div>
+            <SocialShare title={article.title} className="flex lg:hidden flex-row gap-3 text-gray-400" />
           </div>
         </header>
 
@@ -143,6 +132,7 @@ export default async function ArticlePage({ params }: Props) {
           </div>
         )}
       </div>
+      <ViewTracker articleId={article._id.toString()} />
     </article>
   );
 }

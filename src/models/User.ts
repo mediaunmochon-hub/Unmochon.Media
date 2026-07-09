@@ -1,0 +1,25 @@
+import mongoose, { Schema, Document, Model } from 'mongoose';
+
+export interface IUser extends Document {
+  name: string;
+  email: string;
+  passwordHash: string;
+  role: string;
+}
+
+const UserSchema: Schema<IUser> = new Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    passwordHash: { type: String, required: true },
+    role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+// Prevent model overwrite error in Next.js
+const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+
+export default User;

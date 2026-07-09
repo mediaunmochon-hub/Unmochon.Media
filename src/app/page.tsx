@@ -1,65 +1,146 @@
-import Image from "next/image";
+import connectDB from '@/lib/db';
+import Article, { IArticle } from '@/models/Article';
+import User from '@/models/User'; // Ensure User is registered
+import Link from 'next/link';
+import { format } from 'date-fns';
 
-export default function Home() {
+// Helper to ensure MongoDB connection is active
+async function getArticles() {
+  await connectDB();
+  // Force User model to load before populating
+  User.init();
+  
+  const articles = await Article.find({ status: 'published' })
+    .sort({ publishedAt: -1 })
+    .populate('author', 'name')
+    .lean()
+    .limit(20);
+    
+  return articles as unknown as (IArticle & { _id: any, author: { name: string } })[];
+}
+
+export const revalidate = 60; // Revalidate every 60 seconds
+
+export default async function Home() {
+  const allArticles = await getArticles();
+
+  // If no articles, show a placeholder
+  if (!allArticles || allArticles.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+        <h1 className="font-serif text-4xl mb-4">No stories published yet.</h1>
+        <p className="text-gray-500 font-sans">Check back later or access the Admin Dashboard to publish content.</p>
+      </div>
+    );
+  }
+
+  const heroArticle = allArticles[0];
+  const sideArticles = allArticles.slice(1, 5);
+  const masonryArticles = allArticles.slice(5);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      
+      {/* Top Section: Hero (66%) and Side Column (33%) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 border border-vanguard-border mb-12">
+        
+        {/* Top Story Hero */}
+        <article className="lg:col-span-2 border-b lg:border-b-0 lg:border-r border-vanguard-border p-6 md:p-8 flex flex-col">
+          <Link href={`/category/${heroArticle.category.toLowerCase()}`} className="text-vanguard-red font-bold uppercase tracking-wider text-xs mb-4 hover:underline">
+            {heroArticle.category}
+          </Link>
+          <Link href={`/article/${heroArticle.slug}`} className="group mb-6">
+            <h1 className="font-serif text-5xl md:text-6xl font-bold leading-tight group-hover:text-gray-700 transition-colors">
+              {heroArticle.title}
+            </h1>
+          </Link>
+          
+          <div className="flex items-center text-xs text-gray-500 uppercase tracking-widest mb-6 border-b border-gray-100 pb-4">
+            <span className="font-bold text-gray-800 mr-2">{heroArticle.author?.name || 'Vanguard Staff'}</span>
+            <span>•</span>
+            <span className="ml-2">{heroArticle.publishedAt ? format(new Date(heroArticle.publishedAt), 'MMM d, yyyy') : 'Recently'}</span>
+          </div>
+          
+          <p className="font-sans text-xl text-gray-700 mb-8 max-w-2xl">
+            {heroArticle.excerpt}
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+
+          {heroArticle.featureImage && (
+            <Link href={`/article/${heroArticle.slug}`} className="mt-auto block relative aspect-video w-full overflow-hidden bg-gray-100 border border-vanguard-border">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img 
+                src={heroArticle.featureImage} 
+                alt={heroArticle.title} 
+                className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
+              />
+            </Link>
+          )}
+        </article>
+
+        {/* Side Column Top News */}
+        <aside className="lg:col-span-1 flex flex-col h-full bg-vanguard-bg">
+          <div className="p-4 border-b border-vanguard-border bg-gray-50">
+            <h2 className="font-serif font-bold text-lg uppercase tracking-widest text-center text-gray-900">Latest News</h2>
+          </div>
+          <div className="flex-grow flex flex-col divide-y divide-vanguard-border">
+            {sideArticles.map((article) => (
+              <article key={article._id.toString()} className="p-6 hover:bg-gray-50 transition-colors">
+                <Link href={`/category/${article.category.toLowerCase()}`} className="text-vanguard-red font-bold uppercase tracking-wider text-[10px] mb-2 block hover:underline">
+                  {article.category}
+                </Link>
+                <Link href={`/article/${article.slug}`} className="group block">
+                  <h3 className="font-serif text-xl font-bold leading-snug mb-3 group-hover:text-vanguard-red transition-colors">
+                    {article.title}
+                  </h3>
+                </Link>
+                <div className="text-[11px] text-gray-400 uppercase tracking-wider">
+                  {article.publishedAt ? format(new Date(article.publishedAt), 'h:mm a') : 'Just now'}
+                </div>
+              </article>
+            ))}
+            {sideArticles.length === 0 && (
+              <div className="p-6 text-sm text-gray-500 italic">No more recent news.</div>
+            )}
+          </div>
+        </aside>
+      </div>
+
+      {/* Masonry Category Blocks */}
+      {masonryArticles.length > 0 && (
+        <>
+          <div className="border-b-4 border-black mb-8">
+            <h2 className="font-serif font-bold text-3xl mb-2">More from the Archive</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-t border-l border-vanguard-border">
+            {masonryArticles.map((article) => (
+              <article key={article._id.toString()} className="border-r border-b border-vanguard-border p-6 flex flex-col h-full hover:bg-gray-50 transition-colors group">
+                {article.featureImage && (
+                  <Link href={`/article/${article.slug}`} className="block mb-4 overflow-hidden border border-vanguard-border">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img 
+                      src={article.featureImage} 
+                      alt={article.title} 
+                      className="w-full aspect-[3/2] object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </Link>
+                )}
+                <Link href={`/category/${article.category.toLowerCase()}`} className="text-vanguard-red font-bold uppercase tracking-wider text-[10px] mb-2 hover:underline">
+                  {article.category}
+                </Link>
+                <Link href={`/article/${article.slug}`} className="block flex-grow">
+                  <h3 className="font-serif text-xl font-bold leading-snug mb-3 group-hover:text-gray-600 transition-colors">
+                    {article.title}
+                  </h3>
+                  <p className="font-sans text-sm text-gray-600 line-clamp-3">
+                    {article.excerpt}
+                  </p>
+                </Link>
+              </article>
+            ))}
+          </div>
+        </>
+      )}
+
     </div>
   );
 }

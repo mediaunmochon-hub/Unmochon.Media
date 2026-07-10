@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Article from '@/models/Article';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 
 export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -60,7 +60,8 @@ export async function DELETE(request: Request, props: { params: Promise<{ id: st
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
     return NextResponse.json({ success: true });
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to delete article' }, { status: 500 });
+  } catch (error: any) {
+    console.error('DELETE Error:', error);
+    return NextResponse.json({ error: error.message || 'Failed to delete article' }, { status: 500 });
   }
 }

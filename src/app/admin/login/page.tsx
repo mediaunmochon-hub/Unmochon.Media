@@ -79,9 +79,7 @@ export default function AdminLogin() {
             </button>
           </div>
         </form>
-        <div className="mt-4 text-xs text-center text-gray-400">
-          Hint: Use nahida / nahida0211
-        </div>
+
       </div>
     </div>
   );

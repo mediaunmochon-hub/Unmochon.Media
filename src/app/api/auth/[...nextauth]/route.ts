@@ -17,25 +17,29 @@ export const authOptions: NextAuthOptions = {
         
         await connectDB();
         
-        // For demonstration, if DB is empty, let's create a default admin
-        const adminExists = await User.findOne({ email: 'nahida' });
-        if (!adminExists) {
-          const hashedPassword = await bcrypt.hash('nahida0211', 10);
-          await User.create({
-            name: 'Nahida',
-            email: 'nahida',
-            passwordHash: hashedPassword,
-            role: 'admin'
-          });
+        // If DB is empty and admin credentials are provided via env, create a default admin
+        const adminEmail = process.env.ADMIN_EMAIL;
+        const adminPassword = process.env.ADMIN_PASSWORD;
+
+        if (adminEmail && adminPassword) {
+          const adminExists = await User.findOne({ email: adminEmail });
+          if (!adminExists) {
+            const hashedPassword = await bcrypt.hash(adminPassword, 10);
+            await User.create({
+              name: 'Admin',
+              email: adminEmail,
+              passwordHash: hashedPassword,
+              role: 'admin'
+            });
+          }
         }
 
         const user = await User.findOne({ email: credentials.email });
         
         if (user) {
-          // Backward compatibility check for plain-text password from old setup
           const isMatch = await bcrypt.compare(credentials.password, user.passwordHash).catch(() => false);
           
-          if (isMatch || user.passwordHash === credentials.password) {
+          if (isMatch) {
             return {
               id: user._id.toString(),
               name: user.name,

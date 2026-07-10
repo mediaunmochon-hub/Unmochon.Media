@@ -22,10 +22,6 @@ export default function AdminDashboard() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [articleToDelete, setArticleToDelete] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchArticles();
-  }, []);
-
   const fetchArticles = async () => {
     setLoading(true);
     try {
@@ -39,16 +35,24 @@ export default function AdminDashboard() {
     }
   };
 
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
   const handleDelete = async () => {
     if (!articleToDelete) return;
     try {
-      // Create a delete route handler for this (will do next)
-      await fetch(`/api/articles/${articleToDelete}`, { method: 'DELETE' });
+      const res = await fetch(`/api/articles/${articleToDelete}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to delete article');
+      }
       setArticles(articles.filter(a => a._id !== articleToDelete));
       setDeleteModalOpen(false);
       setArticleToDelete(null);
     } catch (error) {
-      console.error(error);
+      console.error('Delete error:', error);
+      alert(error instanceof Error ? error.message : 'An error occurred while deleting');
     }
   };
 

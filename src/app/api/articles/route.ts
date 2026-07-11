@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import connectDB from '@/lib/db';
 import Article from '@/models/Article';
 import { getServerSession } from 'next-auth/next';
@@ -45,6 +46,13 @@ export async function POST(request: Request) {
     }
 
     const article = await Article.create(data);
+    
+    revalidatePath('/');
+    revalidatePath('/admin');
+    if (article.category) {
+      revalidatePath(`/category/${article.category.toLowerCase()}`);
+    }
+    
     return NextResponse.json(article, { status: 201 });
   } catch (error: any) {
     if (error.code === 11000) {

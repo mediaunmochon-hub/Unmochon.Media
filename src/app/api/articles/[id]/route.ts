@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import connectDB from '@/lib/db';
 import Article from '@/models/Article';
 import { getServerSession } from 'next-auth/next';
@@ -37,6 +38,12 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
     if (!article) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
+    revalidatePath('/');
+    revalidatePath('/admin');
+    if (article.category) {
+      revalidatePath(`/category/${article.category.toLowerCase()}`);
+    }
+    revalidatePath(`/article/${article.slug}`);
     return NextResponse.json(article);
   } catch (error: any) {
     if (error.code === 11000) {
@@ -59,6 +66,13 @@ export async function DELETE(request: Request, props: { params: Promise<{ id: st
     if (!article) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+    if (article.category) {
+      revalidatePath(`/category/${article.category.toLowerCase()}`);
+    }
+    
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('DELETE Error:', error);

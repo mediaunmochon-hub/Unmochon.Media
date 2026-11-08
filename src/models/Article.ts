@@ -41,6 +41,10 @@ const ArticleSchema: Schema<IArticle> = new Schema(
   }
 );
 
+// Compound indexes for fast queries used by home page and category pages
+ArticleSchema.index({ status: 1, publishedAt: -1 });
+ArticleSchema.index({ status: 1, category: 1, publishedAt: -1 });
+
 const Article: Model<IArticle> = mongoose.models.Article || mongoose.model<IArticle>('Article', ArticleSchema);
 
 export default Article;

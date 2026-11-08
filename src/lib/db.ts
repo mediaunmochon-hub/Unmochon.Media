@@ -1,9 +1,20 @@
 import mongoose from 'mongoose';
 
-let cached = (global as any).mongoose;
+interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+}
 
-if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
+// Extend NodeJS global to cache the connection across hot reloads in dev
+declare global {
+  // eslint-disable-next-line no-var
+  var mongoose: MongooseCache | undefined;
+}
+
+let cached: MongooseCache = global.mongoose ?? { conn: null, promise: null };
+
+if (!global.mongoose) {
+  global.mongoose = cached;
 }
 
 async function connectDB() {
@@ -16,15 +27,17 @@ async function connectDB() {
       bufferCommands: false,
     };
 
-    let uri = process.env.MONGODB_URI;
+    const uri = process.env.MONGODB_URI;
 
     if (!uri) {
-      throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+      throw new Error(
+        'Please define the MONGODB_URI environment variable inside .env.local'
+      );
     }
 
-    cached.promise = mongoose.connect(uri, opts).then((mongoose) => {
+    cached.promise = mongoose.connect(uri, opts).then((mongooseInstance) => {
       console.log('💡 Successfully connected to MongoDB');
-      return mongoose;
+      return mongooseInstance;
     });
   }
 
@@ -34,7 +47,7 @@ async function connectDB() {
     cached.promise = null;
     throw error;
   }
-  
+
   return cached.conn;
 }
 

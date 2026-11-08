@@ -6,17 +6,22 @@ import { format } from 'date-fns';
 
 // Helper to ensure MongoDB connection is active
 async function getArticles() {
-  await connectDB();
-  // Force User model to load before populating
-  User.init();
-  
-  const articles = await Article.find({ status: 'published' })
-    .sort({ publishedAt: -1 })
-    .populate('author', 'name')
-    .lean()
-    .limit(20);
+  try {
+    await connectDB();
+    // Force User model to load before populating
+    User.init();
     
-  return articles as unknown as (IArticle & { _id: any, author: { name: string } })[];
+    const articles = await Article.find({ status: 'published' })
+      .sort({ publishedAt: -1 })
+      .populate('author', 'name')
+      .lean()
+      .limit(20);
+      
+    return articles as unknown as (IArticle & { _id: any, author: { name: string } })[];
+  } catch (error) {
+    console.error('Database connection error in getArticles:', error);
+    return [];
+  }
 }
 
 export const revalidate = 60; // Revalidate every 60 seconds

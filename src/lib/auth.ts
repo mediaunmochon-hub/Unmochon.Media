@@ -4,6 +4,30 @@ import connectDB from '@/lib/db';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 
+interface UserWithRole {
+  role?: string;
+  id?: string;
+}
+
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+      role?: string;
+      id?: string;
+    };
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    role?: string;
+    id?: string;
+  }
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -14,10 +38,10 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
-        
+
         await connectDB();
-        
-        // If DB is empty and admin credentials are provided via env, create a default admin
+
+        // If ADMIN_EMAIL/ADMIN_PASSWORD env vars are set, auto-seed the admin user on first login
         const adminEmail = process.env.ADMIN_EMAIL;
         const adminPassword = process.env.ADMIN_PASSWORD;
 
@@ -29,16 +53,18 @@ export const authOptions: NextAuthOptions = {
               name: 'Admin',
               email: adminEmail,
               passwordHash: hashedPassword,
-              role: 'admin'
+              role: 'admin',
             });
           }
         }
 
         const user = await User.findOne({ email: credentials.email });
-        
+
         if (user) {
-          const isMatch = await bcrypt.compare(credentials.password, user.passwordHash).catch(() => false);
-          
+          const isMatch = await bcrypt
+            .compare(credentials.password, user.passwordHash)
+            .catch(() => false);
+
           if (isMatch) {
             return {
               id: user._id.toString(),
@@ -48,7 +74,7 @@ export const authOptions: NextAuthOptions = {
             };
           }
         }
-        
+
         return null;
       },
     }),
@@ -56,15 +82,15 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = (user as any).role;
+        token.role = (user as UserWithRole).role;
         token.id = user.id;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).role = token.role;
-        (session.user as any).id = token.id;
+        session.user.role = token.role;
+        session.user.id = token.id;
       }
       return session;
     },
@@ -75,5 +101,6 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
   },
-  secret: process.env.NEXTAUTH_SECRET || 'vanguard-super-secret-key-change-in-prod',
+  // NEXTAUTH_SECRET must be set via environment variable in production
+  secret: process.env.NEXTAUTH_SECRET,
 };

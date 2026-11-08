@@ -12,11 +12,6 @@ type Props = {
 
 // Helper to ensure MongoDB connection is active
 async function getArticlesByCategory(categoryParam: string) {
-  await connectDB();
-  User.init();
-  
-  // Case-insensitive match for category using regex or exact match if normalized
-  // The DB stores them capitalized, e.g., 'Politics', 'Economy'
   const categories = ['Politics', 'Economy', 'Tech', 'Culture', 'Opinion'];
   const matchedCategory = categories.find(c => c.toLowerCase() === categoryParam.toLowerCase());
   
@@ -24,15 +19,26 @@ async function getArticlesByCategory(categoryParam: string) {
     return null;
   }
 
-  const articles = await Article.find({ status: 'published', category: matchedCategory })
-    .sort({ publishedAt: -1 })
-    .populate('author', 'name')
-    .lean();
-    
-  return { 
-    articles: articles as unknown as (IArticle & { _id: any, author: { name: string } })[],
-    categoryName: matchedCategory
-  };
+  try {
+    await connectDB();
+    User.init();
+
+    const articles = await Article.find({ status: 'published', category: matchedCategory })
+      .sort({ publishedAt: -1 })
+      .populate('author', 'name')
+      .lean();
+      
+    return { 
+      articles: articles as unknown as (IArticle & { _id: any, author: { name: string } })[],
+      categoryName: matchedCategory
+    };
+  } catch (error) {
+    console.error('Database connection error in getArticlesByCategory:', error);
+    return {
+      articles: [],
+      categoryName: matchedCategory
+    };
+  }
 }
 
 export async function generateMetadata(

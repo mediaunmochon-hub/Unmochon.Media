@@ -26,7 +26,7 @@ export async function generateMetadata(
   }
 
   return {
-    title: `${article.title} | Vanguard`,
+    title: `${article.title} | UNMOCHON`,
     description: article.excerpt,
     openGraph: {
       title: article.title,
@@ -80,11 +80,11 @@ export default async function ArticlePage({ params }: Props) {
           <div className="flex items-center justify-between border-t border-b border-vanguard-border py-4">
             <div className="flex items-center">
               <div className="w-12 h-12 bg-gray-200 rounded-full mr-4 flex items-center justify-center font-bold text-gray-500 uppercase">
-                {(article.authorName || (article.author as any)?.name || 'V').charAt(0)}
+                {(article.authorName || (article.author as any)?.name || 'U').charAt(0)}
               </div>
               <div>
                 <div className="font-bold text-gray-900 uppercase tracking-wide text-sm">
-                  {article.authorName || (article.author as any)?.name || 'Vanguard Staff'}
+                  {article.authorName || (article.author as any)?.name || 'Unmochon Staff'}
                 </div>
                 <div className="text-xs text-gray-500 uppercase tracking-widest mt-1">
                   {article.publishedAt ? format(new Date(article.publishedAt), 'MMMM d, yyyy') : 'Date unknown'}

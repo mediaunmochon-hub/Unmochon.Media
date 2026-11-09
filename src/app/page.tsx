@@ -61,7 +61,7 @@ export default async function Home() {
           </Link>
           
           <div className="flex items-center text-xs text-gray-500 uppercase tracking-widest mb-6 border-b border-gray-100 pb-4">
-            <span className="font-bold text-gray-800 mr-2">{heroArticle.author?.name || 'Vanguard Staff'}</span>
+            <span className="font-bold text-gray-800 mr-2">{heroArticle.author?.name || 'Unmochon Staff'}</span>
             <span>•</span>
             <span className="ml-2">{heroArticle.publishedAt ? format(new Date(heroArticle.publishedAt), 'MMM d, yyyy') : 'Recently'}</span>
           </div>
@@ -113,8 +113,8 @@ export default async function Home() {
       {/* Masonry Category Blocks */}
       {masonryArticles.length > 0 && (
         <>
-          <div className="border-b-4 border-black mb-8">
-            <h2 className="font-serif font-bold text-3xl mb-2">More from the Archive</h2>
+          <div className="border-b-4 border-vanguard-red mb-8">
+            <h2 className="font-serif font-bold text-3xl mb-2 text-vanguard-red">More from the Archive</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-t border-l border-vanguard-border">
             {masonryArticles.map((article) => (

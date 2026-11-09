@@ -12,7 +12,7 @@ type Props = {
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const { q } = await searchParams;
   return {
-    title: q ? `Search: "${q}" | Vanguard` : 'Search | Vanguard',
+    title: q ? `Search: "${q}" | UNMOCHON` : 'Search | UNMOCHON',
   };
 }
 
@@ -47,8 +47,8 @@ export default async function SearchPage({ searchParams }: Props) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <header className="mb-10 border-b-4 border-black pb-4">
-        <h1 className="font-serif text-4xl font-bold">
+      <header className="mb-10 border-b-4 border-vanguard-red pb-4">
+        <h1 className="font-serif text-4xl font-bold text-vanguard-red">
           {query ? `Results for "${query}"` : 'Search the Archive'}
         </h1>
         {query && (
@@ -93,7 +93,7 @@ export default async function SearchPage({ searchParams }: Props) {
               </Link>
               <div className="mt-4 text-xs text-gray-500 uppercase tracking-widest pt-4 border-t border-gray-100 flex justify-between">
                 <span className="font-bold">
-                  {article.authorName || article.author?.name || 'Vanguard Staff'}
+                  {article.authorName || article.author?.name || 'Unmochon Staff'}
                 </span>
                 <span>
                   {article.publishedAt

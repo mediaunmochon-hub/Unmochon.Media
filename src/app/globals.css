@@ -3,10 +3,12 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --color-vanguard-bg: #FAFAFA;
-  --color-vanguard-text: #111111;
-  --color-vanguard-red: #B91C1C;
-  --color-vanguard-border: #E5E7EB;
+  --color-vanguard-bg: #F5F0E8;
+  --color-vanguard-text: #1A1A1A;
+  --color-vanguard-red: #8B1A1A;
+  --color-vanguard-accent: #6B1414;
+  --color-vanguard-border: #D9D0C4;
+  --color-vanguard-cream: #EDE8E0;
   
   --font-serif: "Merriweather", "Playfair Display", "Lora", serif;
   --font-sans: "Inter", "Roboto", "Lato", sans-serif;

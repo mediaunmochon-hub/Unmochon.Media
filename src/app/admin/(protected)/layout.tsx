@@ -19,7 +19,7 @@ export default async function AdminLayout({
       <header className="bg-black text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <div className="flex items-center gap-6">
           <Link href="/admin" className="font-serif font-bold text-xl tracking-widest text-vanguard-red hover:text-white transition-colors">
-            VANGUARD CMS
+            UNMOCHON CMS
           </Link>
           <nav className="hidden md:flex gap-4 text-sm uppercase tracking-wider font-bold text-gray-300">
             <Link href="/admin" className="hover:text-white transition-colors">Dashboard</Link>

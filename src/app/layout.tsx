@@ -16,8 +16,8 @@ const merriweather = Merriweather({
 });
 
 export const metadata: Metadata = {
-  title: 'Vanguard | Independent News Publication',
-  description: 'Rigorous journalistic aesthetic. Independent news, analysis, and opinion.',
+  title: 'UNMOCHON | Stories They Pay to Bury',
+  description: 'Independent journalism. Unapologetic truth-telling. We uncover the stories others are paid to suppress.',
 };
 
 import { Analytics } from '@vercel/analytics/react';

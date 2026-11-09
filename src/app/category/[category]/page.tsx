@@ -48,7 +48,7 @@ export async function generateMetadata(
   const { category } = await params;
   const capitalized = category.charAt(0).toUpperCase() + category.slice(1);
   return {
-    title: `${capitalized} News & Analysis | Vanguard`,
+    title: `${capitalized} News & Analysis | UNMOCHON`,
     description: `Latest independent news, analysis, and opinion on ${capitalized}.`,
   };
 }
@@ -67,8 +67,8 @@ export default async function CategoryPage({ params }: Props) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <header className="mb-12 border-b-4 border-black pb-4">
-        <h1 className="font-serif text-5xl font-bold uppercase tracking-wide">
+      <header className="mb-12 border-b-4 border-vanguard-red pb-4">
+        <h1 className="font-serif text-5xl font-bold uppercase tracking-wide text-vanguard-red">
           {categoryName}
         </h1>
         <p className="font-sans text-gray-500 mt-2 text-lg">
@@ -106,7 +106,7 @@ export default async function CategoryPage({ params }: Props) {
                 </p>
               </Link>
               <div className="mt-auto text-xs text-gray-500 uppercase tracking-widest pt-4 border-t border-gray-100 flex justify-between">
-                <span className="font-bold">{article.authorName || article.author?.name || 'Vanguard Staff'}</span>
+                <span className="font-bold">{article.authorName || article.author?.name || 'Unmochon Staff'}</span>
                 <span>{article.publishedAt ? format(new Date(article.publishedAt), 'MMM d, yyyy') : ''}</span>
               </div>
             </article>
